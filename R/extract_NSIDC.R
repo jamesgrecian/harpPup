@@ -31,5 +31,8 @@ extract_NSIDC <- function(df, path){
   df$concentration[df$concentration > 1000] <- NA
   df$concentration <- df$concentration/10
   
+  # check order of dataframe
+  df <- df %>% arrange(id, date)
+  
   return(df)
 }
