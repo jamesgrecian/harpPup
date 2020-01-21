@@ -47,6 +47,10 @@ locs <- locs[locs$lat < 85,] # drop locations above 85 N
 locs <- locs[locs$lon > -100,] # drop locations below 100 W
 locs <- locs[locs$lon < 100,] # drop locations above 100 E
 
+# hp6-L752-19 was recovered dead
+locs <- locs %>% filter(case_when(id == "hp6-L752-19" ~ date < "2019-07-29",
+                                  id != "hp6-L752-19" ~ date > min(date))) # remove dead locations
+
 # Find 6 hour intervals so interpolated locations match the dive data
 source("R/SRDL_time.R")
 times <- SRDL_time(locs)
@@ -88,14 +92,8 @@ dives <- dives %>% dplyr::select("REF",
                              "PITCH.DESC",
                              "PITCH.ASC")
 
-ggplot() +
-  geom_point(aes(x = S.DATE, y = SWIM.EFF.DESC/SECS.DESC), data = dives %>% filter(S.DATE > "2019-03-25" & S.DATE < "2019-05-25")) +
-  facet_wrap(~REF)
-
-
 # combine regularised locations with dive data
 dat <- left_join(plocs, dives, by = c("id" = "REF", "date" = "S.DATE"))
-
 saveRDS(dat, "data/dat.rds")
 
 # ends
