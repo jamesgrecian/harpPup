@@ -25,7 +25,7 @@ get_NSIDC <- function(dates, path){
   download_it <- function(x) {
     file <- file.path(path, basename(x))
     if (!file.exists(file)) {
-      curl::curl_download(x, file)
+      tryCatch(curl::curl_download(x, file), error = function(e) cat(paste0("\nData not available for ", dates[i],"\n")))
       return(TRUE)
     } 
     FALSE
