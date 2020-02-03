@@ -30,7 +30,7 @@ extract_NSIDC <- function(df, path){
                         .x
                       })
   # if animal locations are further south than ice raster extent set concentration to 0
-  df <- df %>% mutate(concentration = if_else(Y < raster::extent(r)[3], 0, concentration))
+  df <- df %>% mutate(concentration = if_else(Y < raster::extent(rdummy)[3], 0, concentration))
 
   # #0 is ocean; 2510 pole hole; 2530 coast line; 2540 land; 2550 missing
   # 0-1000 so divide by 10 to get percentage
