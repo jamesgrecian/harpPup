@@ -1,10 +1,16 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
-harpPup
-=======
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
-**harpPup** aims to understand the development of foraging behaviour in
-harp seal pups
+# harpPup
+
+Migratory movements and dive behaviour of juvenile harp seals
+
+The **harpPup** repository contains data and R scripts accompanying the
+paper “Environmental drivers of population-level variation in the
+migratory and diving ontogency of an Arctic top predator” by W. James
+Grecian, Garry B. Stenson, Martin Biuw, Lars Boehme, Lars P. Folkow,
+Pierre J. Goulet, Ian D. Jonsen, Aleksander Malde, Erling S. Nordøy,
+Aqqalu Rosing-Asvid and Sophie Smout.
