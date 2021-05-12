@@ -63,7 +63,7 @@ m03 <- mpmm(~ ice_c + (ice_c | id),
             control = mpmm_control(REML = F))
 anova(m01, m03)
 
-# refit models with ML for prediction
+# refit models with REML for prediction
 m_GS <- mpmm(~  ice_c + depth_c + (1 | id),
              data = dat_GS,
              control = mpmm_control(REML = T)) 
