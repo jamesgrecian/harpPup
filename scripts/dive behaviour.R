@@ -206,6 +206,7 @@ m10 <- gamm(n.cycles ~ s(days, k = 6, bs = "cs") +
             data = dive_sum,
             method = "ML") 
 AIC(m08$lme, m09$lme, m10$lme) # no support for retaining population fixed effect
+AIC(m09$lme) - AIC(m10$lme) # no support for difference between populations
 
 plot(acf(resid(m08$lme, type = "normalized")))
 gratia::appraise(m08$gam)
@@ -322,7 +323,7 @@ p1 <- ggplot() +
   geom_path(aes(x = day, y = max), data = max_depths) +
   ylab("Dive depth (m)") + xlab("Days since start of diving") +
   scale_colour_manual(values = wpal[c(4, 1)]) + scale_fill_manual(values = wpal[c(4, 1)]) +
-  geom_point(aes(x = days, y = max.dep, colour = population), data = dat %>% filter(days < 100) , alpha = 0) +
+  geom_point(aes(x = days, y = max.dep, colour = population), data = dat, alpha = 0) +
   theme(legend.position = "none") +
   scale_x_continuous(limits = c(0, 100), oob = scales::squish, expand = c(0, 0)) + # ggMarginal doesn't work with coord_cartesian
   scale_y_continuous(limits = c(0, 200), oob = scales::squish, expand = c(0, 0))
@@ -346,7 +347,7 @@ max_dur <- max_dur %>% mutate(max = cummax(dur95))
 p2 <- ggplot() +
   theme_bw(base_size = 10) +
   #  theme(text = element_text(family = "serif")) +
-  geom_point(aes(x = days, y = dive.dur/60, colour = population), data = dat %>% filter(days < 100), alpha = 0) +
+  geom_point(aes(x = days, y = dive.dur/60, colour = population), data = dat, alpha = 0) +
   theme(legend.position = "none") +
   geom_line(aes(x = days, y = fit, group = id, colour = population), data = newdata, alpha = 0.4) +
   geom_ribbon(aes(x = days, ymin = pop - (1.96* se.fit), ymax = pop + (1.96* se.fit), group = population, fill = population), data = newdata, alpha = 0.5) +
@@ -364,6 +365,9 @@ p2 <- ggplot() +
 # generate prediction dataframe
 newdata = expand.grid(days = 0:100,
                       id = unique(dat$id))
+ids <- dat %>% group_by(id) %>% slice(1) %>% dplyr::select(id, population) %>% ungroup()
+newdata <- newdata %>% left_join(ids, by = c("id" = "id"))
+
 # append model predictions
 newdata$pop <- predict.gam(m07a$gam, newdata, type = "response", exclude = c("s(days,id)", "s(id)"))/60
 newdata$se.fit <- predict.gam(m07a$gam, newdata, type = "response", exclude = c("s(days,id)", "s(id)"), se.fit = T)$se.fit/60
@@ -372,12 +376,13 @@ newdata$fit <- predict.gam(m07a$gam, newdata, type = "response")/60
 p3 <- ggplot() +
   theme_bw(base_size = 10) +
   #  theme(text = element_text(family = "serif")) +
-  geom_point(aes(x = days, y = surf.dur/60, colour = population), data = dat %>% filter(days < 100), alpha = 0) +
+  geom_point(aes(x = days, y = surf.dur/60, colour = population), data = dat, alpha = 0) +
   theme(legend.position = "none") +
-  geom_line(aes(x = days, y = fit, group = id), data = newdata, alpha = 0.4) +
+  geom_line(aes(x = days, y = fit, group = id, colour = population), data = newdata, alpha = 0.4) +
   geom_ribbon(aes(x = days, ymin = pop - (1.96* se.fit), ymax = pop + (1.96* se.fit)), data = newdata, alpha = 0.5) +
   geom_line(aes(x = days, y = pop), data = newdata, size = 1) +
   ylab("Surface duration (min)") + xlab("Days since start of diving") +
+  scale_colour_manual(values = wpal[c(4, 1)]) + scale_fill_manual(values = wpal[c(4, 1)]) +
   scale_x_continuous(limits = c(0, 100), oob=scales::squish, expand = c(0,0)) + # ggMarginal doesn't work with coord_cartesian
   scale_y_continuous(limits = c(0, 8), oob=scales::squish, expand = c(0,0))
 
@@ -401,12 +406,13 @@ newdata$fit <- predict.gam(m10a$gam, newdata, type = "response")
 p4 <- ggplot() +
   theme_bw(base_size = 10) +
   #  theme(text = element_text(family = "serif")) +
-  geom_point(aes(x = days, y = n.cycles/6), data = dive_sum %>% filter(days < 100), alpha = 0) +
-  geom_line(aes(x = days, y = fit/6, group = id), data = newdata, alpha = 0.4) +
+  geom_point(aes(x = days, y = n.cycles/6, colour = population), data = dive_sum, alpha = 0) +
+  geom_line(aes(x = days, y = fit/6, group = id, colour = population), data = newdata, alpha = 0.4) +
   geom_ribbon(aes(x = days, ymin = (pop - (1.96* se.fit))/6, ymax = (pop + (1.96* se.fit))/6), data = newdata, alpha = 0.5) +
   geom_line(aes(x = days, y = pop/6, group = population), data = newdata, size = 1) +
   theme(legend.position = "none") +
   ylab("Dive rate (dives per h)") + xlab("Days since start of diving") +
+  scale_colour_manual(values = wpal[c(4, 1)]) + scale_fill_manual(values = wpal[c(4, 1)]) +
   scale_x_continuous(limits = c(0, 100), oob = scales::squish, expand = c(0, 0)) + # ggMarginal doesn't work with coord_cartesian
   scale_y_continuous(limits = c(0, 20), oob = scales::squish, expand = c(0, 0))
 
@@ -433,7 +439,7 @@ max_depths2 <- max_depths2 %>% mutate(max = cummax(depth95))
 p5 <- ggplot() +
   theme_bw(base_size = 10) +
   #  theme(text = element_text(family = "serif")) +
-  geom_point(aes(x = days, y = max.depth, colour = population), data = dive_sum %>% filter(days < 100), alpha = 0) +
+  geom_point(aes(x = days, y = max.depth, colour = population), data = dive_sum, alpha = 0) +
   geom_line(aes(x = days, y = fit, group = id, colour = population), data = newdata, alpha = 0.4) +
   geom_ribbon(aes(x = days, ymin = pop - (1.96* se.fit), ymax = pop + (1.96* se.fit), group = population, fill = population), data = newdata, alpha = 0.5) +
   geom_line(aes(x = days, y = pop, group = population, colour = population), data = newdata, size = 1) +
@@ -467,7 +473,7 @@ max_dur2 <- max_dur2 %>% mutate(max = cummax(dur95))
 p6 <- ggplot() +
   theme_bw(base_size = 10) +
   #  theme(text = element_text(family = "serif")) +
-  geom_point(aes(x = days, y = max.dur/60, colour = population), data = dive_sum %>% filter(days < 100) %>% filter(max.dur > 0), alpha = 0) +
+  geom_point(aes(x = days, y = max.dur/60, colour = population), data = dive_sum %>% filter(max.dur > 0), alpha = 0) +
   geom_line(aes(x = days, y = fit, group = id, colour = population), data = newdata, alpha = 0.4) +
   geom_ribbon(aes(x = days, ymin = (pop - (1.96* se.fit)), ymax = (pop + (1.96* se.fit)), group = population, fill = population), data = newdata, alpha = 0.5) +
   geom_line(aes(x = days, y = pop, group = population, colour = population), data = newdata, size = 1) +
@@ -511,7 +517,7 @@ prow <- plot_grid(ggExtra::ggMarginal(p1,
                   ggExtra::ggMarginal(p3,
                                       type = "density",
                                       margins = "both",
-                                      fill = "grey",
+                                      groupFill = T,
                                       size = 5,
                                       xparams = list(size = 0.2),
                                       yparams = list(size = 0.2)),
@@ -532,7 +538,7 @@ prow <- plot_grid(ggExtra::ggMarginal(p1,
                   ggExtra::ggMarginal(p4,
                                       type = "density",
                                       margins = "both",
-                                      fill = "grey",
+                                      groupFill = T,
                                       size = 5,
                                       xparams = list(size = 0.2),
                                       yparams = list(size = 0.2)),
@@ -544,6 +550,6 @@ prow <- plot_grid(ggExtra::ggMarginal(p1,
 
 plot_grid(prow, legend, nrow = 2, rel_heights = c(1, .1))
 
-quartz.save(file = "figures/combo dive stats 20200512.jpeg", type = "jpeg",
+quartz.save(file = "figures/combo dive stats 20200513.jpeg", type = "jpeg",
             dev  = dev.cur(), dpi = 500)
 dev.off()
