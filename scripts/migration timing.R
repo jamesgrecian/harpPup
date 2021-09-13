@@ -28,7 +28,7 @@ fdp <- posterior(fd)
 dat$states <- fdp$state # append states
 
 # identify switches between states
-dat <- dat %>% group_by(id) %>% dplyr::select(id, date, lon, lat, lat_diff, states) %>% 
+dat <- dat %>% group_by(id) %>% dplyr::select(deployment, id, date, lon, lat, lat_diff, states) %>% 
   mutate(select = states - lag(states, default = first(states), order_by = date))
 
 # pull dates of switches and calculate length of time spent in each state
