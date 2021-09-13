@@ -44,9 +44,19 @@ date_poly <- tibble(x1 = c(ymd_hms("2017-04-23 00:00:00"), ymd_hms("2019-06-05 0
                                    "Northwest Atlantic"))
 
 p1 <- ggplot() +
-  theme_bw() +
+  theme_bw(base_size = 14) +
+  ylab("Latitude") + xlab("Month") +
   geom_rect(aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, group = deployment), alpha = 0.25, data = date_poly) +
   geom_point(aes(x = date, y = lat, colour = factor(states)), data = dat) + 
   scale_color_viridis_d("state") +
-  facet_wrap(~deployment, scales = "free")
+  facet_wrap(~deployment, scales = "free") +
+  theme(legend.position = "bottom")
+
+quartz(title = "Panel Plot", width = 9, height = 5)
 print(p1)
+quartz.save(file = "figures/supplementary migration timing.jpeg", type = "jpeg",
+            dev  = dev.cur(), dpi = 500)
+
+dev.off()
+
+# ends
