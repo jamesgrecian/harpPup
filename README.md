@@ -10,7 +10,7 @@ Migratory movements and dive behaviour of juvenile harp seals
 
 The **harpPup** repository contains data and R scripts accompanying the
 paper “Environmental drivers of population-level variation in the
-migratory and diving ontogency of an Arctic top predator” by W. James
+migratory and diving ontogeny of an Arctic top predator” by W. James
 Grecian, Garry B. Stenson, Martin Biuw, Lars Boehme, Lars P. Folkow,
 Pierre J. Goulet, Ian D. Jonsen, Aleksander Malde, Erling S. Nordøy,
 Aqqalu Rosing-Asvid and Sophie Smout.
