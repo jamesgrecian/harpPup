@@ -50,13 +50,23 @@ p1 <- ggplot() +
   geom_point(aes(x = date, y = lat, colour = factor(states)), data = dat) + 
   scale_color_viridis_d("state") +
   facet_wrap(~deployment, scales = "free") +
+  theme(legend.position = "none")
+
+p2 <- ggplot() + 
+  theme_bw(base_size = 14) +
+  geom_density(aes(x = abs(lat_diff), fill = "state 2"), alpha = .75, data = dat %>% filter(states == 2)) +
+  geom_density(aes(x = abs(lat_diff), fill = "state 1"), alpha = .75, data = dat %>% filter(states == 1)) +
+  scale_fill_viridis_d("") +
+  scale_x_continuous(limits = c(-.05, .6)) +
+  ylab("density") + xlab(expression(Latitudinal~displacement~(degree*N~d^{-1}))) +
+  facet_wrap(~deployment) +
   theme(legend.position = "bottom")
 
-quartz(title = "Panel Plot", width = 9, height = 5)
-print(p1)
+require(patchwork)
+quartz(title = "Panel Plot", width = 9, height = 8)
+p1 / p2 +  plot_layout(heights = c(2, 1)) + plot_annotation(tag_levels = "a")
 quartz.save(file = "figures/supplementary migration timing.jpeg", type = "jpeg",
             dev  = dev.cur(), dpi = 500)
-
 dev.off()
 
 # ends
