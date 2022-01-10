@@ -13,6 +13,10 @@ dat <- readRDS("data/move_persistence.rds")
 # force animal id to character from factor for mpmm model object
 dat <- dat %>% mutate(id = as.character(id))
 
+# check for collinearity between ice and depth using VIF
+install.packages("faraway")
+faraway::vif(dat[c("ice", "depth")])
+
 # run mpmm models seperately for two populations
 dat_GS <- dat %>% filter(deployment == "hp4")
 dat_NW <- dat %>% filter(deployment == "hp6")
